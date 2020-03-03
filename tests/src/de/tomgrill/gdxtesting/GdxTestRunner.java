@@ -16,21 +16,26 @@
 
 package de.tomgrill.gdxtesting;
 
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.headless.HeadlessApplication;
-import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.graphics.GL20;
+import static org.mockito.Mockito.mock;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.runner.JUnitCore;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.headless.HeadlessApplication;
+import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
+import com.badlogic.gdx.graphics.GL20;
 
-import static org.mockito.Mockito.mock;
-
+/**
+ * Run this as a Java application to run all tests using JUnit.
+ */
 public class GdxTestRunner extends BlockJUnit4ClassRunner implements ApplicationListener {
 
 	private Map<FrameworkMethod, RunNotifier> invokeInRender = new HashMap<FrameworkMethod, RunNotifier>();
@@ -41,6 +46,10 @@ public class GdxTestRunner extends BlockJUnit4ClassRunner implements Application
 
 		new HeadlessApplication(this, conf);
 		Gdx.gl = mock(GL20.class);
+	}
+
+	public static void main(String[] args) {
+		JUnitCore.main("com.dicycat.kroy.AllTests");
 	}
 
 	@Override
