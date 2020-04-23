@@ -124,7 +124,7 @@ public class Minigame {
             pipes.add(new Pipe(0, 1));
             pipes.add(new Pipe(0, 1));
         }
-
+        
         updateDraw();
     }
 
@@ -146,13 +146,14 @@ public class Minigame {
         this.check.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent input, float x, float y) {
+            	
                 boolean flag = true;
-                for (Pipe pipe : pipes){
-                   flag = flag & pipe.isCorrect();
-                }
-                if (flag == true){
+
+                flag = isConnected(pipes);
+                System.out.println(flag);
+                if (flag){
                     table.reset();
-                    state = State.WON;
+                    state = State.WON; 
                     updateDraw();
                 }
             }
@@ -280,6 +281,129 @@ public class Minigame {
      */
     public void visibility(boolean state){
         this.table.setVisible(state);
+    }
+    
+    
+    
+    public boolean isConnected( ArrayList<Pipe> p) {
+
+    	if(state == State.GAME1) {
+            if(pipes.get(8).getRotation()!= 3 || pipes.get(0).getRotation() != 1 || pipes.get(3).getRotation() == 1 || pipes.get(5).getRotation()== 3 || pipes.get(5).getRotation()== 0)
+            	return false;
+            else if (pipes.get(3).getRotation() == 0)
+            	if(pipes.get(6).getRotation() == 3 && pipes.get(7).getRotation() == 2 && ( pipes.get(5).getRotation() == 1 || pipes.get(5).getRotation() == 2))
+            		return true;
+            	else 
+            		return false;
+            else if (pipes.get(3).getRotation() == 3)
+            	if(pipes.get(7).getRotation() == 2 && pipes.get(6).getRotation() == 3 &&  (pipes.get(5).getRotation() == 1 || pipes.get(5).getRotation() == 2)) 
+            		return true;
+            	else 
+            		return false;
+            else if (pipes.get(3).getRotation() == 2)
+            	if(pipes.get(6).getRotation() == 3 && pipes.get(7).getRotation() == 2 &&  (pipes.get(5).getRotation() == 1 || pipes.get(5).getRotation() == 2))
+            		return true;
+            	else
+            		return false;
+     
+            
+        }
+    	
+    	
+        else if(state == State.GAME2) {
+        	if(pipes.get(0).getRotation()== 0 || pipes.get(15).getRotation()!= 3 || pipes.get(1).getRotation()== 0) {
+        		return false;
+        	}else if(pipes.get(1).getRotation()== 3) {
+        		if(pipes.get(2).getRotation() != 1)
+        			return false;
+        		else if(pipes.get(6).getRotation() == 0 || pipes.get(6).getRotation() == 1)
+        			return false;
+        		else if(pipes.get(6).getRotation() == 3)
+        			if(pipes.get(11).getRotation() != 2 || pipes.get(10).getRotation() == 0 || pipes.get(9).getRotation() != 3 || pipes.get(8).getRotation() != 0 || pipes.get(12).getRotation() !=  3 || pipes.get(13).getRotation() == 0 || pipes.get(14).getRotation() == 0)
+        				return false;
+        			else
+        				return true;
+        		else if(pipes.get(6).getRotation() == 2) {
+        			if(pipes.get(5).getRotation() == 2)
+        				return false;
+        			else if(pipes.get(5).getRotation() == 3)
+        				if( pipes.get(8).getRotation() != 3 || pipes.get(9).getRotation()!= 3 || pipes.get(10).getRotation() == 0 || pipes.get(11).getRotation() != 1)
+        					return false;
+        				else 
+        					return true;
+        			else 
+        				if( (pipes.get(10).getRotation() == 0 || pipes.get(11).getRotation() != 1) 
+            					&& (pipes.get(8).getRotation() != 0 || pipes.get(12).getRotation() !=  3 || pipes.get(13).getRotation() == 0 || pipes.get(14).getRotation() == 0) )
+        					return false;
+        				else 
+        					return true;        			
+        		} 		
+        	}else if(pipes.get(1).getRotation()== 1) {
+        		if (pipes.get(5).getRotation()== 1)
+        			return false;
+        		else if(pipes.get(5).getRotation()== 0) {
+        			if (pipes.get(9).getRotation()!= 3 ) 
+        				return false; 
+        			else if( (pipes.get(8).getRotation() != 0 || pipes.get(12).getRotation() !=  3 || pipes.get(13).getRotation() == 0 || pipes.get(14).getRotation() == 0) && (pipes.get(10).getRotation() == 0 || pipes.get(11).getRotation() != 1))
+        				return false;
+        			else
+        				return true;
+        		}else if(pipes.get(5).getRotation()== 2) {
+        			if (pipes.get(9).getRotation()!= 3 ) 
+        				return false;
+        			else if( (pipes.get(10).getRotation() == 0 || pipes.get(11).getRotation() != 1) 
+        					&& (pipes.get(8).getRotation() != 0 || pipes.get(12).getRotation() !=  3 || pipes.get(13).getRotation() == 0 || pipes.get(14).getRotation() == 0) )
+        				return false;
+        			else 
+        				return true;
+        				
+        		
+        		}else if(pipes.get(5).getRotation()== 3) {
+	        		if( pipes.get(8).getRotation() != 3 || pipes.get(9).getRotation()!= 3 || pipes.get(10).getRotation() == 0 || pipes.get(11).getRotation() != 1)
+	        			return false;
+	        		else 
+	        			return true;
+        		}
+        	}
+        }
+        	
+        	
+        else if(state == State.GAME3) {            //???
+        		if(pipes.get(0).getRotation() == 0 ||  pipes.get(4).getRotation() == 3 || pipes.get(8).getRotation() == 1 || pipes.get(12).getRotation() != 3 || pipes.get(13).getRotation() == 0 || pipes.get(14).getRotation() == 0 || pipes.get(15).getRotation() == 0)
+        			return false ;
+        		else if(pipes.get(0).getRotation() == 1 || pipes.get(0).getRotation() == 2)
+        			if(pipes.get(4).getRotation() == 0 || pipes.get(4).getRotation() == 2)
+        				return true;
+        			else
+        				return false;
+        		else if (pipes.get(0).getRotation() == 3)
+        			if(pipes.get(1).getRotation() == 1 || pipes.get(1).getRotation() == 2)
+        				if(pipes.get(9).getRotation() != 3 || pipes.get(10).getRotation() == 0  || pipes.get(11).getRotation() != 2)
+        					return false;
+        				else if( pipes.get(4).getRotation() == 1 || pipes.get(4).getRotation() == 0)
+        					return true;
+        				else 
+        					return false;
+        		    else if(pipes.get(1).getRotation() == 3)
+        		    	if (pipes.get(2).getRotation() == 1 || pipes.get(2).getRotation() == 2) 
+        		    		if( pipes.get(6).getRotation() != 2 )
+        		    			return false;
+        		    		else if(pipes.get(9).getRotation() != 3 || pipes.get(10).getRotation() == 0  || pipes.get(11).getRotation() != 2 || pipes.get(4).getRotation() == 2 || pipes.get(4).getRotation() == 3)
+        		    			return false; 
+        		    		else 
+        		    			return true;
+        		    	else if ( pipes.get(2).getRotation() == 3)
+        		    		if( pipes.get(3).getRotation() == 1 && pipes.get(7).getRotation() == 0  && pipes.get(9).getRotation() == 3 && pipes.get(10).getRotation() == 1  && pipes.get(11).getRotation() == 2 && (pipes.get(4).getRotation() == 0  || pipes.get(4).getRotation() == 1))
+        		    			return true;
+        		    		else 
+        		    			return false;
+        			
+        		
+                
+      }
+
+    return false;
+        
     }
 
 }
