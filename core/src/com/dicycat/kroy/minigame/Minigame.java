@@ -284,7 +284,10 @@ public class Minigame {
     }
     
     
-    
+    /**
+     *  Check if water can reach the last pipe or not
+     *  @return true if correct, otherwise false
+     */
     public boolean isConnected( ArrayList<Pipe> p) {
 
     	if(state == State.GAME1) {

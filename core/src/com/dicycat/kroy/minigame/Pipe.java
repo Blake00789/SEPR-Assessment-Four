@@ -89,23 +89,15 @@ public class Pipe {
     }
 
     /**
-     * Checks if the orientation of the pipe is correct
-     * @return true if correct, otherwise false
+     *  @return rotation
      */
-    public boolean isCorrect(){
-        if (this.getRotation() == this.correctRotation){
-            System.out.println("true");
-            return true;
-        }else{
-            System.out.println("false");
-            return false;
-        }
-    }
-
 	public int getRotation() {
 		return rotation;
 	}
-
+	
+	/**
+     *  set rotation
+     */
 	public void setRotation(int rotation) {
 		this.rotation = rotation;
 	}
