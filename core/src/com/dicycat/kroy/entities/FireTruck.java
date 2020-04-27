@@ -4,22 +4,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.dicycat.kroy.GameObject;
 import com.dicycat.kroy.Kroy;
 import com.dicycat.kroy.misc.StatBar;
 import com.dicycat.kroy.misc.WaterStream;
 import com.dicycat.kroy.screens.GameScreen;
+//Power up changes by Sam Hutchings
+import java.time.Instant;
+import java.time.Duration;
 
 /**
- * GameObject controlled controlled by the player which automatically fires
+ * GameObject controlled by the player which automatically fires
  * at hostile enemies when they're within range.
  * 
  * @author Riju De
@@ -45,10 +44,12 @@ public class FireTruck extends Entity{
 	private StatBar healthBar;
 	private boolean firing;
 	private float range;
+	public int index;
 
 	public FireTruck(Vector2 spawnPos, Float[] truckStats, int truckNum) {
-		super(spawnPos, Kroy.mainGameScreen.textures.getTruck(truckNum), new Vector2(25,50), 100, 500);
 
+		super(spawnPos, Kroy.mainGameScreen.textures.getTruck(truckNum), new Vector2(25,50), 100, 500);
+		this.index = truckNum;
 		DIRECTIONS.put("n",0);			//North Facing Direction (up arrow)
 		DIRECTIONS.put("w",90);			//West Facing Direction (left arrow)
 		DIRECTIONS.put("s",180);		//South Facing Direction (down arrow)
@@ -78,6 +79,7 @@ public class FireTruck extends Entity{
 		// TRUCK_SELECT_CHANGE_6 - START OF MODIFICATION - NP STUDIOS - LUCY IVATT----
 		selected = false; // initially sets the truck to false
 		// TRUCK_SELECT_CHANGE_6 - END OF MODIFICATION - NP STUDIOS - LUCY IVATT----
+		shouldSave = true;
 	}
 
 	/**
@@ -108,7 +110,7 @@ public class FireTruck extends Entity{
 	}
 
 	/**
-	 * Method checks if any arrow keys currently pressed and then converts them into a integer direction
+	 * Method checks if any arrow keys currently pressed and then converts them into a integer direction b
 	 * @return Direction to follow
 	 */
 	public Integer updateDirection() { 
@@ -184,6 +186,10 @@ public class FireTruck extends Entity{
 
 		healthBar.setPosition(getCentre().add(0,25));
 		healthBar.setBarDisplay((healthPoints*50)/maxHealthPoints);
+		
+		
+		//Changes for shield powerup
+		if(shield) updateShield();
 
 	}
 	
@@ -265,8 +271,9 @@ public class FireTruck extends Entity{
 	public void die() {
 		super.die();
 		water.setRemove(true);
-		tank.setRemove(true);
-		healthBar.setRemove(true);
+		// Water and health bars disappear when set to 0
+		setWater(0);
+		setHealthPoints(0);
 	}
 
 	public Rectangle getHitbox(){
@@ -282,6 +289,7 @@ public class FireTruck extends Entity{
 	public void refillWater(){
 		this.currentWater = this.maxWater;
 	}
+	public void setWater(float water) {this.currentWater = water;}
 	// END OF MODIFICATION  - NP STUDIOS -----------------------------------------
 
 	// REPLENISH_2: OVER TIME -> INSTANT  - START OF MODIFICATION - NP STUDIOS - LUCY IVATT -----------------------------------------
@@ -322,4 +330,82 @@ public class FireTruck extends Entity{
 		this.selected = selected;
 	}
 	// TRUCK_SELECT_CHANGE_8 - END OF MODIFICATION - NP STUDIOS - LUCY IVATT----
+
+	
+	//Power up changes
+	
+	public float getSpeed() { return speed; }
+	public void setSpeed(float speed) {	this.speed = speed; }
+	public float getFlowRate() { return flowRate; }
+	public void setFlowRate(float flowRate) { this.flowRate = flowRate; }
+	public float getMaxWater() { return maxWater; }
+	public void setMaxWater(float maxWater) { this.maxWater = maxWater; }
+
+	public void increaseSpeed() {
+		setSpeed(getSpeed() + 150f);
+	}
+
+	public void increaseDamage() {
+		setFlowRate(getFlowRate() * 3f);
+		setMaxWater(getMaxWater() * 3f);
+		currentWater = currentWater * 3f;
+	}
+	
+	private Boolean shield = false;
+	private Instant shieldActivatedTime;
+	private float shieldLifeTime;
+	private int shieldHealth;
+	private Texture originalTexture;
+	
+	public void setShield(float time) {
+		shield = true;
+		shieldActivatedTime = Instant.now();
+		shieldLifeTime = time;
+		originalTexture = getTexture();
+		setTexture(new Texture("fireTruckShield.png"));
+		shieldHealth = healthPoints;
+	}
+	
+	public void updateShield() {
+		if ((Duration.between(shieldActivatedTime, Instant.now()).getSeconds()) > shieldLifeTime) {
+			shield = false;
+			setTexture(originalTexture);
+		} else {
+			healthPoints = shieldHealth;
+		}
+	}
+
+ 	@Override
+	public String save() {
+		//For firetrucks, we need the position, health, water, index, and whether its selected.
+		String output = this.getPosition().x + "@" + this.getPosition().y;
+		output += "@" + this.healthPoints;
+		output += "@" + this.currentWater;
+		output += "@" + this.selected;
+		return output;
+	}
+ 	
+ 	@Override
+ 	public void load(String data) {
+ 		//The data is split into an array of strings
+ 		String[] values = data.split("@");
+ 		
+ 		// Indices 0 and 1 are the x and y co-ordinates of the truck
+ 		setPosition(new Vector2(Float.parseFloat(values[0]),Float.parseFloat(values[1])));
+ 		
+ 		// Indices 2, 3, and 4 are the health, water, and selected truck values
+ 		setHealthPoints(Integer.parseInt(values[2]));
+ 		setWater(Float.parseFloat(values[3]));
+ 		setSelected(Boolean.parseBoolean(values[4]));
+ 		
+		// If the "selected" value returns true then the truck is set as the active truck
+		if(Boolean.parseBoolean(values[4])) Kroy.mainGameScreen.activeTruck = index;
+
+ 	}
+ 	
+ 	@Override
+ 	public String getUUID() {
+ 		return ("truck" + index);
+ 	}
+	
 }

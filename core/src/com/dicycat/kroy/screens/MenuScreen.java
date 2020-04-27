@@ -65,7 +65,7 @@ public class MenuScreen implements Screen{
 
   
   public static Music music = Gdx.audio.newMusic(Gdx.files.internal("gamemusic.mp3"));
-  public static float musicVolume = 0.4f;
+  public static float musicVolume = 0.5f;
 
   //coordinates for Play and Exit buttons 
   private int buttonWidth = 250;
@@ -87,6 +87,8 @@ public class MenuScreen implements Screen{
   
   private FireTruckSelectionScene fireTruckSelector;
   private boolean currentlyRunningGame = false;
+  
+  public static int gameModeSelect;
 
   /**
    *  Used to define the current state of the screen, 
@@ -98,8 +100,9 @@ public class MenuScreen implements Screen{
 	  OPTIONS,
 	  MINIGAME,
 	  // CONTROL_SCREEN_4 - START OF MODIFICATION - NP STUDIOS - JORDAN SPOONER
-	  CONTROLS // adding a new window state, the controls window, has the code that calls the creation and setup of the controls window
+	  CONTROLS, // adding a new window state, the controls window, has the code that calls the creation and setup of the controls window
 	  // CONTROL_SCREEN_4 - END OF MODIFICATION - NP STUDIOS - JORDAN SPOONER
+	  LOADGAME
   }
   
   public MenuScreenState state = MenuScreenState.MAINMENU;
@@ -272,9 +275,33 @@ public class MenuScreen implements Screen{
 	public void clickCheck() {
 		// TRUCK_SELECT_CHANGE_19 - START OF MODIFICATION - NP STUDIOS - LUCY IVATT----
 		// Start Game Button click event
-		fireTruckSelector.startGameButton.addListener(new ClickListener() {
+//		fireTruckSelector.startGameButton.addListener(new ClickListener() {
+//			@Override
+//	    	public void clicked(InputEvent event, float x, float y) {
+//				startGame();// Starts game
+//	    	}
+//	    });
+		
+		fireTruckSelector.easyGameButton.addListener(new ClickListener() {
 			@Override
 	    	public void clicked(InputEvent event, float x, float y) {
+				gameModeSelect = 1;
+				startGame();// Starts game
+	    	}
+	    });
+		
+		fireTruckSelector.normalGameButton.addListener(new ClickListener() {
+			@Override
+	    	public void clicked(InputEvent event, float x, float y) {
+				gameModeSelect = 2;
+				startGame();// Starts game
+	    	}
+	    });
+		
+		fireTruckSelector.hardGameButton.addListener(new ClickListener() {
+			@Override
+	    	public void clicked(InputEvent event, float x, float y) {
+				gameModeSelect = 3;
 				startGame();// Starts game
 	    	}
 	    });
@@ -296,6 +323,8 @@ public class MenuScreen implements Screen{
 			 game.newGame(); // Calls the function in Kroy to start a new game
 		 }
 	}
+
+
 	// TRUCK_SELECT_CHANGE_20 - END OF MODIFICATION - NP STUDIOS - LUCY IVATT----
 
   public void setCurrentlyRunningGame(boolean state) {
