@@ -321,6 +321,7 @@ public class GameScreen implements Screen {
 			minigame.stage.draw();
 			minigame.stage.act();
 			minigame.clickCheck();
+			minigameSaveCheck();
 			break;
 		default:
 			break;
@@ -329,6 +330,10 @@ public class GameScreen implements Screen {
 
 	public void newMinigame() {
 		minigame = new Minigame(game, true);
+	}
+
+	public void newMinigameFromLoad(Integer config, String data) {
+		minigame = new Minigame(game, true, config, data);
 	}
 
 	/**
@@ -602,6 +607,7 @@ public class GameScreen implements Screen {
 				pref.putFloat("gametime", gameTimer);
 				pref.putInteger("score", hud.getScore());
 				pref.putInteger("fortressesCount", fortressesCount);
+				pref.putBoolean("inMinigame", false);
 				pref.flush(); // Flush = save to file
 
 			}
@@ -627,6 +633,12 @@ public class GameScreen implements Screen {
 				hud.setScore(pref.getInteger("score"));
 				fortressesCount = pref.getInteger("fortressesCount");
 
+				boolean inMinigame = pref.getBoolean("inMinigame");
+				if (inMinigame) {
+					newMinigame();
+					setGameState(GameScreen.GameScreenState.MINIGAME);
+				}
+
 				// TODO Figure out why the game gets loaded a bunch of times every click
 				// -Could be because the click is held down and it just repeatedly loads;
 				// -Requires more investigation
@@ -635,8 +647,34 @@ public class GameScreen implements Screen {
 
 		});
 
+
 	}
 
+	//This is seperate because minigame.ClickCheck only works in the minigame, and clickcheck() only works outside of it.
+	private void minigameSaveCheck() {
+		//Loading from minigame
+		minigame.save.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+
+				saveObjects(gameObjects, "gameObjects");
+				saveObjects(deadObjects, "deadObjects");
+
+				// gameData is the Preference name given to non-object data
+				Preferences pref = Gdx.app.getPreferences("gameData");
+				pref.putFloat("gametime", gameTimer);
+				pref.putInteger("score", hud.getScore());
+				pref.putInteger("fortressesCount", fortressesCount);
+				//Same code, but this time we specify that we came from the minigame
+				pref.putInteger("config", minigame.config);
+				pref.putString("pipes", minigame.savePipes());
+				pref.flush(); // Flush = save to file
+
+
+			}
+
+		});
+	}
 	/**
 	 * Use this method to swap between two GameObject lists, based on a Preference
 	 *
@@ -717,6 +755,7 @@ public class GameScreen implements Screen {
 				.collect(Collectors.toMap(GameObject::getUUID, GameObject::save)));
 		pref.flush();
 	}
+
 
 	/**
 	 * Remove one fortress to the fortressCount

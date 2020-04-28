@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.dicycat.kroy.Kroy;
+import com.dicycat.kroy.scenes.PauseWindow;
 import com.dicycat.kroy.screens.GameScreen;
 import com.dicycat.kroy.screens.MenuScreen;
 import java.util.ArrayList;
@@ -34,15 +35,18 @@ public class Minigame {
     private SpriteBatch sb;
     private NinePatch patch;
     private NinePatchDrawable background;
-    private Skin skin;
+    private Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-    private ArrayList<Pipe> pipes = new ArrayList<>(); //stores all of the pipes, which are each an individual piece of the puzzle.
+    public ArrayList<Pipe> pipes = new ArrayList<>(); //stores all of the pipes, which are each an individual piece of the puzzle.
     private ImageButton check;
 
     private TextButton back;
+    public TextButton save;
     private boolean inGame;
 
     private static Minigame.State state;
+    public Integer config;
+
 
     /**
      *	Allows to have multiple versions of the Minigame without needing to create multiple Stages.
@@ -57,10 +61,11 @@ public class Minigame {
     public Minigame(Kroy game, boolean inGame){
         patch = new NinePatch(new Texture("loool.jpg"), 3, 3, 3, 3);
         background = new NinePatchDrawable(patch);
-        skin = new Skin(Gdx.files.internal("uiskin.json")); //Allows for text to be written in the table
+         //Allows for text to be written in the table
         check = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(
                 "check.png"))));
         back = new TextButton("RETURN", skin);
+        save = new TextButton("SAVE", skin);
         sb = game.batch;
         this.inGame = inGame;
         Viewport viewport = new ScreenViewport(new OrthographicCamera());
@@ -68,8 +73,9 @@ public class Minigame {
         table.reset();
         table.setBackground(background);
 
+
         Random rand = new Random();
-        Integer config = rand.nextInt(3);
+        config = rand.nextInt(3);
         if (config == 0) {
             state = State.GAME1;
             pipes.add(new Pipe(1, 1));
@@ -128,11 +134,86 @@ public class Minigame {
         updateDraw();
     }
 
+    public Minigame(Kroy game, boolean inGame, Integer config, String pipeData){
+        patch = new NinePatch(new Texture("loool.jpg"), 3, 3, 3, 3);
+        background = new NinePatchDrawable(patch);
+        //Allows for text to be written in the table
+        check = new ImageButton(new TextureRegionDrawable(new TextureRegion(new Texture(
+                "check.png"))));
+        back = new TextButton("RETURN", skin);
+        save = new TextButton("SAVE", skin);
+        sb = game.batch;
+        this.inGame = inGame;
+        Viewport viewport = new ScreenViewport(new OrthographicCamera());
+        stage = new Stage(viewport, sb);
+        table.reset();
+        table.setBackground(background);
+
+
+        Random rand = new Random();
+
+        if (config == 0) {
+            state = State.GAME1;
+            pipes.add(new Pipe(1, 1));
+            pipes.add(new Pipe(1, 0));
+            pipes.add(new Pipe(1, 1));
+            pipes.add(new Pipe(2, 0));
+            pipes.add(new Pipe(3, 0));
+            pipes.add(new Pipe(2, 2));
+            pipes.add(new Pipe(1, 3));
+            pipes.add(new Pipe(1, 2));
+            pipes.add(new Pipe(1, 3));
+        }else if (config == 1){
+            state = State.GAME2;
+            pipes.add(new Pipe(0, 1));
+            pipes.add(new Pipe(2, 1));
+            pipes.add(new Pipe(1, 1));
+            pipes.add(new Pipe(3, 0));
+
+            pipes.add(new Pipe(3, 0));
+            pipes.add(new Pipe(2, 0));
+            pipes.add(new Pipe(1, 2));
+            pipes.add(new Pipe(3, 0));
+
+            pipes.add(new Pipe(1, 0));
+            pipes.add(new Pipe(2, 3));
+            pipes.add(new Pipe(0, 1));
+            pipes.add(new Pipe(1, 1));
+
+            pipes.add(new Pipe(1, 3));
+            pipes.add(new Pipe(0, 1));
+            pipes.add(new Pipe(0, 1));
+            pipes.add(new Pipe(2, 3));
+        }else{
+            state = State.GAME3;
+            pipes.add(new Pipe(2, 1));
+            pipes.add(new Pipe(2, 1));
+            pipes.add(new Pipe(2, 1));
+            pipes.add(new Pipe(1, 1));
+
+            pipes.add(new Pipe(2, 0));
+            pipes.add(new Pipe(3, 0));
+            pipes.add(new Pipe(1, 2));
+            pipes.add(new Pipe(0, 0));
+
+            pipes.add(new Pipe(0, 0));
+            pipes.add(new Pipe(1, 3));
+            pipes.add(new Pipe(0, 1));
+            pipes.add(new Pipe(1, 2));
+
+            pipes.add(new Pipe(1, 3));
+            pipes.add(new Pipe(0, 1));
+            pipes.add(new Pipe(0, 1));
+            pipes.add(new Pipe(0, 1));
+        }
+
+        updateDraw();
+    }
     /**
      * Allows for the user to interact with the minigame pipes and buttons via clicking. Executes the necessary code
      * when this occurs.
      */
-    public void clickCheck() {
+    public void  clickCheck() {
         for (final Pipe pipe : pipes){
             pipe.getButton().addListener(new ClickListener() {
                 @Override
@@ -170,6 +251,12 @@ public class Minigame {
                     return;
             }
         });// Returns the user to the screen they were in before the minigame was started.
+
+        this.save.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+            }
+        });
     }
 
     /**
@@ -210,7 +297,7 @@ public class Minigame {
                 table.add().width(128);
                 table.add(check);
                 table.add().width(160);
-
+                table.add(save);
                 // Draws the puzzle out in a table where each cell is a pipe in the puzzle.
                 table.setFillParent(true);
                 stage.addActor(table);
@@ -256,7 +343,7 @@ public class Minigame {
                 table.add().width(128);
                 table.add().width(128);
                 table.add(check);
-
+                table.add(save);
                 table.setFillParent(true);
                 stage.addActor(table);
                 break;
@@ -280,6 +367,16 @@ public class Minigame {
      */
     public void visibility(boolean state){
         this.table.setVisible(state);
+    }
+
+    public String savePipes() {
+        String data = "";
+        for (Pipe pipe: pipes) {
+            data += String.valueOf(pipe.type)
+            + String.valueOf(pipe.correctRotation)
+            + String.valueOf(pipe.rotation);
+        }
+        return data;
     }
 
 }
