@@ -95,7 +95,7 @@ public class Pipe {
             }
         }else if (type == 3) {
             this.image = new Texture("pipeX.png");
-            this.rotation = 0;
+            this.rotation = currentRotation;
         }
         button = new ImageButton(new TextureRegionDrawable(new TextureRegion(this.image)));
     }

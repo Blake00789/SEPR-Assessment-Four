@@ -332,8 +332,8 @@ public class GameScreen implements Screen {
 		minigame = new Minigame(game, true);
 	}
 
-	public void newMinigameFromLoad(Integer config, String data) {
-		minigame = new Minigame(game, true, config, data);
+	public void newMinigameFromLoad(String data) {
+		minigame = new Minigame(game, true, data);
 	}
 
 	/**
@@ -635,7 +635,7 @@ public class GameScreen implements Screen {
 
 				boolean inMinigame = pref.getBoolean("inMinigame");
 				if (inMinigame) {
-					newMinigame();
+					newMinigameFromLoad(pref.getString("pipes"));
 					setGameState(GameScreen.GameScreenState.MINIGAME);
 				}
 
@@ -666,7 +666,7 @@ public class GameScreen implements Screen {
 				pref.putInteger("score", hud.getScore());
 				pref.putInteger("fortressesCount", fortressesCount);
 				//Same code, but this time we specify that we came from the minigame
-				pref.putInteger("config", minigame.config);
+				pref.putBoolean("inMinigame", true);
 				pref.putString("pipes", minigame.savePipes());
 				pref.flush(); // Flush = save to file
 

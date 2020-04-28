@@ -134,7 +134,8 @@ public class Minigame {
         updateDraw();
     }
 
-    public Minigame(Kroy game, boolean inGame, Integer config, String pipeData){
+    //Load a minigame given preexisting save data
+    public Minigame(Kroy game, boolean inGame, String pipeData){
         patch = new NinePatch(new Texture("loool.jpg"), 3, 3, 3, 3);
         background = new NinePatchDrawable(patch);
         //Allows for text to be written in the table
@@ -150,61 +151,14 @@ public class Minigame {
         table.setBackground(background);
 
 
-        Random rand = new Random();
-
-        if (config == 0) {
-            state = State.GAME1;
-            pipes.add(new Pipe(1, 1));
-            pipes.add(new Pipe(1, 0));
-            pipes.add(new Pipe(1, 1));
-            pipes.add(new Pipe(2, 0));
-            pipes.add(new Pipe(3, 0));
-            pipes.add(new Pipe(2, 2));
-            pipes.add(new Pipe(1, 3));
-            pipes.add(new Pipe(1, 2));
-            pipes.add(new Pipe(1, 3));
-        }else if (config == 1){
-            state = State.GAME2;
-            pipes.add(new Pipe(0, 1));
-            pipes.add(new Pipe(2, 1));
-            pipes.add(new Pipe(1, 1));
-            pipes.add(new Pipe(3, 0));
-
-            pipes.add(new Pipe(3, 0));
-            pipes.add(new Pipe(2, 0));
-            pipes.add(new Pipe(1, 2));
-            pipes.add(new Pipe(3, 0));
-
-            pipes.add(new Pipe(1, 0));
-            pipes.add(new Pipe(2, 3));
-            pipes.add(new Pipe(0, 1));
-            pipes.add(new Pipe(1, 1));
-
-            pipes.add(new Pipe(1, 3));
-            pipes.add(new Pipe(0, 1));
-            pipes.add(new Pipe(0, 1));
-            pipes.add(new Pipe(2, 3));
-        }else{
-            state = State.GAME3;
-            pipes.add(new Pipe(2, 1));
-            pipes.add(new Pipe(2, 1));
-            pipes.add(new Pipe(2, 1));
-            pipes.add(new Pipe(1, 1));
-
-            pipes.add(new Pipe(2, 0));
-            pipes.add(new Pipe(3, 0));
-            pipes.add(new Pipe(1, 2));
-            pipes.add(new Pipe(0, 0));
-
-            pipes.add(new Pipe(0, 0));
-            pipes.add(new Pipe(1, 3));
-            pipes.add(new Pipe(0, 1));
-            pipes.add(new Pipe(1, 2));
-
-            pipes.add(new Pipe(1, 3));
-            pipes.add(new Pipe(0, 1));
-            pipes.add(new Pipe(0, 1));
-            pipes.add(new Pipe(0, 1));
+        //For every 3 digits, we have a new pipe in the format [type, correctrotation, currentrotation]
+        for (Integer i = 0; i < pipeData.length() / 3; i++) {
+            //Get the info for the next pipe
+            String nextPipe = pipeData.substring(i * 3, (i * 3 + 3));
+            System.out.println(nextPipe);
+            //Insert pipe in pertaining to data
+            //Use substring and integer.parseint because charAt returns a character, and so integer.valueof returns its ASCII number, not the number it may represent
+            pipes.add(new Pipe(Integer.parseInt(nextPipe.substring(0, 1)), Integer.parseInt(nextPipe.substring(1, 2)), Integer.parseInt(nextPipe.substring(2, 3))));
         }
 
         updateDraw();
